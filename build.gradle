@@ -1,0 +1,95 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java-library'
+    id 'maven'
+    id 'signing'
+    id 'org.javamodularity.moduleplugin' version '1.6.0'
+    id 'io.codearte.nexus-staging' version '0.21.2'
+}
+
+targetCompatibility = sourceCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = 11
+
+group = 'com.wexalian.common'
+version = '0.0.4'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.wexalian.nullability:nullability:0.0.2'
+
+    implementation 'com.google.code.gson:gson:2.9.0'
+}
+
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: deployRepoUrl) {
+                authentication(userName: deployRepoUsername, password: deployRepoPassword)
+            }
+
+            snapshotRepository(url: deployRepoUrlSnapshot) {
+                authentication(userName: deployRepoUsername, password: deployRepoPassword)
+            }
+
+            pom.project {
+                name = 'common'
+                packaging = 'jar'
+                description = 'A common library for code used in multiple of my projects'
+                url = 'https://www.github.com/Wexalian/common'
+
+                licenses {
+                    license {
+                        name = 'The Unlicense'
+                        url = 'https://unlicense.org/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Wexalian'
+                        name = 'Lars Gerrits'
+                        email = 'larsgerrits99@gmail.com'
+//                        organization = 'wexalian'
+//                        organizationUrl = 'http://www.wexalian.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Wexalian/common.git'
+                    developerConnection = 'scm:git:ssh://github.com/Wexalian/common.git'
+                    url = 'https://www.github.com/Wexalian/common'
+                }
+            }
+        }
+    }
+}
+
+nexusStaging {
+    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+}
