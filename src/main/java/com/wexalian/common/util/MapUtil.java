@@ -5,6 +5,7 @@ import com.wexalian.nullability.annotations.Nonnull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -49,6 +50,13 @@ public class MapUtil {
         public <K, V> Map<K, V> values(@Nonnull Iterable<V> values, @Nonnull Function<V, K> mapping) {
             Map<K, V> map = (Map<K, V>) mapSupplier.get();
             values.forEach(value -> map.put(mapping.apply(value), value));
+            return map;
+        }
+        
+        @Nonnull
+        public <K, V> Map<K, V> fill(@Nonnull Consumer<Map<K, V>> filler) {
+            Map<K, V> map = (Map<K, V>) mapSupplier.get();
+            filler.accept(map);
             return map;
         }
     }
