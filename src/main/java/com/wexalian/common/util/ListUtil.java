@@ -4,6 +4,7 @@ import com.wexalian.nullability.annotations.Nonnull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ListUtil {
@@ -21,19 +22,26 @@ public class ListUtil {
     public static class Builder {
         private final Supplier<List<?>> listSupplier;
         
-        public Builder(Supplier<List<?>> listSupplier) {
+        private Builder(Supplier<List<?>> listSupplier) {
             this.listSupplier = listSupplier;
         }
         
         @Nonnull
-        public <T> List<T> values(T... values) {
+        public <T> List<T> values(@Nonnull T... values) {
             return values(List.of(values));
         }
         
         @Nonnull
-        public <T> List<T> values(Iterable<T> values) {
+        public <T> List<T> values(@Nonnull Iterable<T> values) {
             List<T> list = (List<T>) listSupplier.get();
             values.forEach(list::add);
+            return list;
+        }
+        
+        @Nonnull
+        public <T> List<T> fill(@Nonnull Consumer<List<T>> filler) {
+            List<T> list = (List<T>) listSupplier.get();
+            filler.accept(list);
             return list;
         }
     }
