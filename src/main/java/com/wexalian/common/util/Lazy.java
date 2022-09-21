@@ -1,4 +1,4 @@
-package com.wexalian.common.lazy;
+package com.wexalian.common.util;
 
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
