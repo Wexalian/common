@@ -1,6 +1,6 @@
 package com.wexalian.common.unchecked;
 
-import com.wexalian.common.util.collection.StringUtil;
+import com.wexalian.common.util.StringUtil;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
