@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import com.wexalian.common.lazy.Lazy;
-import com.wexalian.common.util.StringUtil;
+import com.wexalian.common.util.Lazy;
+import com.wexalian.common.util.collection.StringUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
 
@@ -91,7 +91,7 @@ public final class GsonUtil {
         }
     }
     
-    public static <T> void toJsonFile(@Nonnull JsonElement json, @Nonnull Path path) {
+    public static void toJsonFile(@Nonnull JsonElement json, @Nonnull Path path) {
         try {
             String content = DEFAULT_GSON.getOrDefault(customGson).toJson(json);
             Files.writeString(path, content);
