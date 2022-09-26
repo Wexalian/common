@@ -10,6 +10,7 @@ module com.wexalian.common {
     exports com.wexalian.common.unchecked;
     exports com.wexalian.common.util;
     exports com.wexalian.common.util.collection;
+    exports com.wexalian.common.util.collection.wrapper;
     
     opens com.wexalian.common.gson to com.google.gson;
 }
