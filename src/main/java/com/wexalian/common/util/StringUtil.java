@@ -22,8 +22,17 @@ public class StringUtil {
     }
     
     @Nonnull
-    public static String format(@Nonnull String text, @Nonnull Object... params) {
+    public static String format(@Nonnull String text, @Nonnull Object[] params) {
         String formatted = text;
+        for (Object param : params) {
+            formatted = formatted.replaceFirst("\\{}", param.toString());
+        }
+        return formatted;
+    }
+    
+    @Nonnull
+    public static String format(@Nonnull String text, @Nonnull Object first, @Nonnull Object... params) {
+        String formatted = text.replaceFirst("\\{}", first.toString());
         for (Object param : params) {
             formatted = formatted.replaceFirst("\\{}", param.toString());
         }
