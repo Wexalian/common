@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class StringUtil {
+    
     public static boolean isNull(@Nullable String string) {
         return string == null;
     }
@@ -51,10 +52,10 @@ public class StringUtil {
     }
     
     @Nonnull
-    public static String slug(@Nonnull String title) {
-        String normalized = Normalizer.normalize(title.toLowerCase(), Normalizer.Form.NFD);
-        return normalized.toLowerCase()
+    public static String slug(@Nonnull String text) {
+        return Normalizer.normalize(text, Normalizer.Form.NFD)
                          .replaceAll("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+", "")
+                         .toLowerCase()
                          .replace(' ', '_')
                          .replace('-', '_')
                          .replaceAll("[^a-zA-Z_\\d]+", "")
