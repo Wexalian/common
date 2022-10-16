@@ -6,13 +6,13 @@ buildscript {
 
 plugins {
     id 'java-library'
-    id 'maven'
+    id 'maven-publish'
     id 'signing'
     id 'org.javamodularity.moduleplugin' version '1.6.0'
     id 'io.codearte.nexus-staging' version '0.21.2'
 }
 
-targetCompatibility = sourceCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = 11
+//targetCompatibility = sourceCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = 17
 
 group = 'com.wexalian.common'
 version = '0.0.10'
@@ -33,38 +33,33 @@ task javadocJar(type: Jar) {
     from javadoc
 }
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-artifacts {
-    archives javadocJar, sourcesJar
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
 
 signing {
     sign configurations.archives
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: deployRepoUrl) {
-                authentication(userName: deployRepoUsername, password: deployRepoPassword)
-            }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'common'
+            from components.java
 
-            snapshotRepository(url: deployRepoUrlSnapshot) {
-                authentication(userName: deployRepoUsername, password: deployRepoPassword)
-            }
-
-            pom.project {
+            pom {
                 name = 'common'
                 packaging = 'jar'
                 description = 'A common library for code used in multiple of my projects'
                 url = 'https://www.github.com/Wexalian/common'
-
                 licenses {
                     license {
                         name = 'The Unlicense'
@@ -76,8 +71,8 @@ uploadArchives {
                         id = 'Wexalian'
                         name = 'Lars Gerrits'
                         email = 'larsgerrits99@gmail.com'
-//                        organization = 'wexalian'
-//                        organizationUrl = 'http://www.wexalian.com'
+                        organization = 'wexalian'
+                        organizationUrl = 'https://www.wexalian.com'
                     }
                 }
                 scm {
@@ -86,6 +81,16 @@ uploadArchives {
                     url = 'https://www.github.com/Wexalian/common'
                 }
             }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username = deployRepoUsername
+                password = deployRepoPassword
+            }
+
+            url = deployRepoUrl
         }
     }
 }
