@@ -37,6 +37,7 @@ public class StringUtilTests {
     @Test
     void format() {
         assertEquals("Value: 4", StringUtil.format("Value: {}", 4));
+        assertEquals("Value: 1.00", StringUtil.format("Value: {%.2f}", 1F));
     }
     
     @Test
