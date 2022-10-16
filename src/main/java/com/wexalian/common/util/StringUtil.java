@@ -26,18 +26,24 @@ public class StringUtil {
     public static String format(@Nonnull String text, @Nonnull Object[] params) {
         String formatted = text;
         for (Object param : params) {
-            formatted = formatted.replaceFirst("\\{}", param.toString());
+            formatted = formatNextParam(text, param);
         }
         return formatted;
     }
     
     @Nonnull
     public static String format(@Nonnull String text, @Nonnull Object first, @Nonnull Object... params) {
-        String formatted = text.replaceFirst("\\{}", first.toString());
-        for (Object param : params) {
-            formatted = formatted.replaceFirst("\\{}", param.toString());
+        return format(formatNextParam(text, first), params);
+    }
+    
+    private static String formatNextParam(String text, Object param) {
+        int start = text.indexOf("{");
+        int end = text.indexOf("}", start);
+        if (end - start == 1) {
+            return text.replaceFirst("\\{}", param.toString());
         }
-        return formatted;
+        String format = text.substring(start + 1, end);
+        return text.replaceFirst("\\{" + format + "}", String.format(format, param));
     }
     
     @Nonnull
