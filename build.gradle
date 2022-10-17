@@ -1,3 +1,5 @@
+import java.time.Duration
+
 buildscript {
     repositories {
         mavenCentral()
@@ -8,12 +10,12 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-    id 'org.javamodularity.moduleplugin' version '1.6.0'
-    id 'io.codearte.nexus-staging' version '0.21.2'
+    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
 }
 
 group = 'com.wexalian.common'
-version = '0.0.10'
+version = '0.0.11'
 
 repositories {
     mavenCentral()
@@ -34,20 +36,9 @@ test {
 }
 
 java {
-    withJavadocJar()
     withSourcesJar()
+    withJavadocJar()
 }
-
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
-}
-
-signing {
-    sign configurations.archives
-}
-
 
 publishing {
     publications {
@@ -83,22 +74,28 @@ publishing {
             }
         }
     }
-    repositories {
-        maven {
-            credentials {
-                username = deployRepoUsername
-                password = deployRepoPassword
-            }
+}
 
-            url = deployRepoUrl
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            username = deployRepoUsername
+            password = deployRepoPassword
         }
+    }
+    transitionCheckOptions {
+        maxRetries.set(40)
+        delayBetween.set(Duration.ofMillis(3000))
     }
 }
 
-nexusStaging {
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+signing {
+    sign publishing.publications.mavenJava
 }
 
-configurations {
-    testCompile
-}
+//configurations {
+//    testCompile
+//}
