@@ -1,4 +1,4 @@
-package com.wexalian.common.util.collection;
+package com.wexalian.common.collection;
 
 import com.wexalian.nullability.annotations.Nonnull;
 

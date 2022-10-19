@@ -9,8 +9,8 @@ module com.wexalian.common {
     exports com.wexalian.common.stream;
     exports com.wexalian.common.unchecked;
     exports com.wexalian.common.util;
-    exports com.wexalian.common.util.collection;
-    exports com.wexalian.common.util.collection.wrapper;
+    exports com.wexalian.common.collection;
+    exports com.wexalian.common.collection.wrapper;
     
     opens com.wexalian.common.gson to com.google.gson;
 }
