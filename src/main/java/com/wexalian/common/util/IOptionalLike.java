@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 
 @FunctionalInterface
 public interface IOptionalLike<T> {
+    IOptionalLike<?> EMPTY = () -> null;
+    
     @Nullable
     T get();
     
@@ -19,7 +21,7 @@ public interface IOptionalLike<T> {
     }
     
     default boolean isPresent() {
-        return !isEmpty();
+        return get() != null;
     }
     
     @Nonnull
@@ -66,28 +68,31 @@ public interface IOptionalLike<T> {
     }
     
     @Nonnull
+    @SuppressWarnings("unchecked")
     default IOptionalLike<T> filter(@Nonnull Predicate<T> predicate) {
         T value = get();
         if (value == null || isEmpty() || !predicate.test(value)) {
-            return () -> null;
+            return (IOptionalLike<T>)EMPTY;
         }
         return () -> value;
     }
     
     @Nonnull
+    @SuppressWarnings("unchecked")
     default <U> IOptionalLike<U> map(@Nonnull Function<T, U> mapper) {
         T value = get();
         if (value == null || isEmpty()) {
-            return () -> null;
+            return (IOptionalLike<U>)EMPTY;
         }
         return () -> mapper.apply(value);
     }
     
     @Nonnull
+    @SuppressWarnings("unchecked")
     default <U> IOptionalLike<U> flatMap(@Nonnull Function<T, IOptionalLike<U>> mapper) {
         T value = get();
         if (value == null || isEmpty()) {
-            return () -> null;
+            return (IOptionalLike<U>)EMPTY;
         }
         return mapper.apply(value);
     }
