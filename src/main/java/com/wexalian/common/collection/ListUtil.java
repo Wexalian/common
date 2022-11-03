@@ -27,19 +27,25 @@ public class ListUtil {
         }
         
         @Nonnull
-        public <T> List<T> values(@Nonnull T... values) {
+        public final <T> List<T> value(@Nonnull T value) {
+            return values(List.of(value));
+        }
+        
+        @Nonnull
+        @SafeVarargs
+        public final <T> List<T> values(@Nonnull T... values) {
             return values(List.of(values));
         }
         
         @Nonnull
-        public <T> List<T> values(@Nonnull Iterable<T> values) {
+        public final <T> List<T> values(@Nonnull Iterable<T> values) {
             List<T> list = (List<T>) listSupplier.get();
             values.forEach(list::add);
             return list;
         }
         
         @Nonnull
-        public <T> List<T> fill(@Nonnull Consumer<List<T>> filler) {
+        public final <T> List<T> fill(@Nonnull Consumer<List<T>> filler) {
             List<T> list = (List<T>) listSupplier.get();
             filler.accept(list);
             return list;
