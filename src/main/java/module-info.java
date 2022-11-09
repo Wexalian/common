@@ -6,6 +6,7 @@ module com.wexalian.common {
     requires com.google.gson;
     
     exports com.wexalian.common.collection;
+    exports com.wexalian.common.collection.iterator;
     exports com.wexalian.common.collection.wrapper;
     exports com.wexalian.common.gson;
     exports com.wexalian.common.property;
