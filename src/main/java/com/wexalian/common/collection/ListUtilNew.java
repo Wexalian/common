@@ -7,54 +7,54 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ListUtil {
+public class ListUtilNew {
     @Nonnull
-    @Deprecated
     public static Builder newArrayList() {
         return newList(ArrayList::new);
     }
     
     @Nonnull
-    @Deprecated
     public static Builder newList(@Nonnull Supplier<List<?>> listSupplier) {
-        throw new UnsupportedOperationException("ListUtil is old, please use ListUtilNew!");
+        return new Builder(listSupplier);
     }
     
     @SuppressWarnings("unchecked")
     public static class Builder {
         private final Supplier<List<?>> listSupplier;
+        private final List<ListAdder<?>> adders = new ArrayList<>();
         
         private Builder(Supplier<List<?>> listSupplier) {
             this.listSupplier = listSupplier;
         }
         
         @Nonnull
-        @Deprecated
-        public final <T> List<T> value(@Nonnull T value) {
-            return values(List.of(value));
+        public final <T> void value(@Nonnull T value) {
+            adders.add(list -> list.add(value));
         }
         
-        @Nonnull
-        @Deprecated
         @SafeVarargs
-        public final <T> List<T> values(@Nonnull T... values) {
-            return values(List.of(values));
+        public final <T> void values(@Nonnull T... values) {
+            values(List.of(values));
+        }
+        
+        public final <T> void values(@Nonnull Iterable<T> values) {
+            adders.add(list -> values.forEach(list::add));
+        }
+        
+        public final <T> void fill(@Nonnull Consumer<List<T>> filler) {
+            adders.add(list -> filler.accept((List<T>) list));
         }
         
         @Nonnull
-        @Deprecated
-        public final <T> List<T> values(@Nonnull Iterable<T> values) {
+        public final <T> List<T> create() {
             List<T> list = (List<T>) listSupplier.get();
-            values.forEach(list::add);
+            adders.forEach(adder -> ((ListAdder<T>) adder).addToList(list));
             return list;
         }
         
-        @Nonnull
-        @Deprecated
-        public final <T> List<T> fill(@Nonnull Consumer<List<T>> filler) {
-            List<T> list = (List<T>) listSupplier.get();
-            filler.accept(list);
-            return list;
+        @FunctionalInterface
+        public interface ListAdder<T> {
+            void addToList(@Nonnull List<T> list);
         }
     }
 }
