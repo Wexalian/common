@@ -5,13 +5,13 @@ import com.wexalian.nullability.annotations.Nonnull;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ReverseIterator<T> implements ListIterator<T> {
+public class ReverseListIterator<T> implements ListIterator<T> {
     public final List<T> backingList;
     public ListIterator<T> iterator;
     public boolean validForUpdate = true;
     public boolean changed = true;
     
-    private ReverseIterator(@Nonnull List<T> backingList) {
+    private ReverseListIterator(@Nonnull List<T> backingList) {
         this.backingList = backingList;
         reset();
     }
