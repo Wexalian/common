@@ -9,7 +9,7 @@ public class ReverseListIterator<T> implements ListIterator<T> {
     public final List<T> backingList;
     public ListIterator<T> iterator;
     public boolean validForUpdate = true;
-    public boolean changed = true;
+    public boolean isReset = true;
     
     private ReverseListIterator(@Nonnull List<T> backingList) {
         this.backingList = backingList;
@@ -25,7 +25,7 @@ public class ReverseListIterator<T> implements ListIterator<T> {
     public T next() {
         T previous = iterator.previous();
         validForUpdate = true;
-        changed = true;
+        isReset = false;
         return previous;
     }
     
@@ -38,7 +38,7 @@ public class ReverseListIterator<T> implements ListIterator<T> {
     public T previous() {
         T next = iterator.next();
         validForUpdate = true;
-        changed = true;
+        isReset = false;
         return next;
     }
     
@@ -58,7 +58,7 @@ public class ReverseListIterator<T> implements ListIterator<T> {
             throw new IllegalStateException("Cannot remove from list until next() or previous() called");
         }
         iterator.remove();
-        changed = true;
+        isReset = false;
     }
     
     @Override
@@ -67,7 +67,7 @@ public class ReverseListIterator<T> implements ListIterator<T> {
             throw new IllegalStateException("Cannot set to list until next() or previous() called");
         }
         iterator.set(value);
-        changed = true;
+        isReset = false;
     }
     
     @Override
@@ -78,13 +78,18 @@ public class ReverseListIterator<T> implements ListIterator<T> {
         iterator.add(value);
         iterator.previous();
         validForUpdate = false;
-        changed = true;
+        isReset = false;
     }
     
     public void reset() {
-        if (changed) {
+        if (!isReset) {
             iterator = backingList.listIterator(backingList.size());
-            changed = false;
+            isReset = true;
         }
+    }
+    
+    @Nonnull
+    public static <T> ReverseListIterator<T> of(@Nonnull List<T> list) {
+        return new ReverseListIterator<>(list);
     }
 }
