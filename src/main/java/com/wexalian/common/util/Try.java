@@ -1,6 +1,7 @@
 package com.wexalian.common.util;
 
 import com.wexalian.nullability.annotations.Nonnull;
+import com.wexalian.nullability.function.NonnullConsumer;
 import com.wexalian.nullability.function.NonnullSupplier;
 
 public abstract class Try<T> extends Either<T, Throwable>{
@@ -18,6 +19,11 @@ public abstract class Try<T> extends Either<T, Throwable>{
     public abstract boolean isSuccess();
     
     public abstract boolean isFailure();
+    
+    public abstract void onSuccess(@Nonnull NonnullConsumer<T> consumer);
+    
+    public abstract void onFailure(@Nonnull NonnullConsumer<Throwable> consumer);
+    
     
     public static <T> Try<T> of(@Nonnull NonnullSupplier<T> supplier) {
         try {
@@ -58,6 +64,16 @@ public abstract class Try<T> extends Either<T, Throwable>{
         public boolean isFailure() {
             return false;
         }
+    
+        @Override
+        public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
+        
+        }
+    
+        @Override
+        public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
+        
+        }
     }
     
     private static class Failure<T> extends Try<T> {
@@ -88,6 +104,16 @@ public abstract class Try<T> extends Either<T, Throwable>{
         @Override
         public boolean isFailure() {
             return true;
+        }
+    
+        @Override
+        public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
+        
+        }
+    
+        @Override
+        public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
+        
         }
     }
 }
