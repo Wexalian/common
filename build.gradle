@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.wexalian.nullability:nullability:0.0.2'
+    implementation 'com.wexalian.nullability:nullability:0.0.5'
 
     implementation 'com.google.code.gson:gson:2.9.0' //TODO api instead of implementation?
 
