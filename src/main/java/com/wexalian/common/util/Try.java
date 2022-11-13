@@ -43,7 +43,7 @@ public abstract class Try<T> extends Either<T, Throwable> {
     public static <T> Try<T> success(@Nonnull T value) {
         return new Success<>(value);
     }
-    public static Try<?> failure(@Nonnull Throwable cause) {
+    public static <T> Try<T> failure(@Nonnull Throwable cause) {
         return new Failure<>(cause);
     }
     
