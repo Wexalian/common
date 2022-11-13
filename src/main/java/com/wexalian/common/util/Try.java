@@ -4,7 +4,7 @@ import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.function.NonnullConsumer;
 import com.wexalian.nullability.function.NonnullSupplier;
 
-public abstract class Try<T> extends Either<T, Throwable>{
+public abstract class Try<T> extends Either<T, Throwable> {
     
     private Try(T value, Throwable cause) {
         super(value, cause);
@@ -20,10 +20,17 @@ public abstract class Try<T> extends Either<T, Throwable>{
     
     public abstract boolean isFailure();
     
-    public abstract void onSuccess(@Nonnull NonnullConsumer<T> consumer);
+    public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
+        if (isSuccess()) {
+            consumer.accept(get());
+        }
+    }
     
-    public abstract void onFailure(@Nonnull NonnullConsumer<Throwable> consumer);
-    
+    public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
+        if (isFailure()) {
+            consumer.accept(getCause());
+        }
+    }
     
     public static <T> Try<T> of(@Nonnull NonnullSupplier<T> supplier) {
         try {
@@ -64,16 +71,7 @@ public abstract class Try<T> extends Either<T, Throwable>{
         public boolean isFailure() {
             return false;
         }
-    
-        @Override
-        public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
         
-        }
-    
-        @Override
-        public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
-        
-        }
     }
     
     private static class Failure<T> extends Try<T> {
@@ -105,15 +103,6 @@ public abstract class Try<T> extends Either<T, Throwable>{
         public boolean isFailure() {
             return true;
         }
-    
-        @Override
-        public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
         
-        }
-    
-        @Override
-        public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
-        
-        }
     }
 }
