@@ -3,9 +3,11 @@ package com.wexalian.common.util;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.function.NonnullSupplier;
 
-public abstract class Try<T> {
+public abstract class Try<T> extends Either<T, Throwable>{
     
-    private Try() {}
+    private Try(T value, Throwable cause) {
+        super(value, cause);
+    }
     
     @Nonnull
     public abstract T get();
@@ -21,8 +23,8 @@ public abstract class Try<T> {
         try {
             return new Success<>(supplier.get());
         }
-        catch (Throwable throwable) {
-            return new Failure<>(throwable);
+        catch (Throwable cause) {
+            return new Failure<>(cause);
         }
     }
     
@@ -31,6 +33,7 @@ public abstract class Try<T> {
         private final T result;
         
         public Success(T result) {
+            super(result, null);
             this.result = result;
         }
         
@@ -61,6 +64,7 @@ public abstract class Try<T> {
         private final Throwable cause;
         
         public Failure(Throwable cause) {
+            super(null, cause);
             this.cause = cause;
         }
         

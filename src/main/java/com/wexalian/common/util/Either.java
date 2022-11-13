@@ -9,7 +9,7 @@ public class Either<LEFT, RIGHT> {
     private final LEFT left;
     private final RIGHT right;
     
-    private Either(LEFT left, RIGHT right) {
+    protected Either(LEFT left, RIGHT right) {
         this.left = left;
         this.right = right;
     }
