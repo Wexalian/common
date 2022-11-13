@@ -5,7 +5,6 @@ import com.wexalian.nullability.function.NonnullConsumer;
 import com.wexalian.nullability.function.NonnullSupplier;
 
 public abstract class Try<T> extends Either<T, Throwable> {
-    
     private Try(T value, Throwable cause) {
         super(value, cause);
     }
@@ -39,6 +38,13 @@ public abstract class Try<T> extends Either<T, Throwable> {
         catch (Throwable cause) {
             return new Failure<>(cause);
         }
+    }
+    
+    public static <T> Try<T> success(@Nonnull T value) {
+        return new Success<>(value);
+    }
+    public static Try<?> failure(@Nonnull Throwable cause) {
+        return new Failure<>(cause);
     }
     
     private static class Success<T> extends Try<T> {
