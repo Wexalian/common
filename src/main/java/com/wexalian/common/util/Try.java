@@ -19,16 +19,20 @@ public abstract class Try<T> extends Either<T, Throwable> {
     
     public abstract boolean isFailure();
     
-    public void onSuccess(@Nonnull NonnullConsumer<T> consumer) {
+    public boolean onSuccess(@Nonnull NonnullConsumer<T> consumer) {
         if (isSuccess()) {
             consumer.accept(get());
+            return true;
         }
+        return false;
     }
     
-    public void onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
+    public boolean onFailure(@Nonnull NonnullConsumer<Throwable> consumer) {
         if (isFailure()) {
             consumer.accept(getCause());
+            return true;
         }
+        return false;
     }
     
     public static <T> Try<T> of(@Nonnull NonnullSupplier<T> supplier) {
