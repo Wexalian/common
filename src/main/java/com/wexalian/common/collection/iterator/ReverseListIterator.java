@@ -10,7 +10,7 @@ public class ReverseListIterator<T> implements ListIterator<T>, Iterable<T> {
     public final List<T> backingList;
     public ListIterator<T> iterator;
     public boolean validForUpdate = true;
-    public boolean isReset = true;
+    public boolean isReset = false;
     
     private ReverseListIterator(@Nonnull List<T> backingList) {
         this.backingList = backingList;
