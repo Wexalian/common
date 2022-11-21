@@ -2,10 +2,11 @@ package com.wexalian.common.collection.iterator;
 
 import com.wexalian.nullability.annotations.Nonnull;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ReverseListIterator<T> implements ListIterator<T> {
+public class ReverseListIterator<T> implements ListIterator<T>, Iterable<T> {
     public final List<T> backingList;
     public ListIterator<T> iterator;
     public boolean validForUpdate = true;
@@ -86,6 +87,11 @@ public class ReverseListIterator<T> implements ListIterator<T> {
             iterator = backingList.listIterator(backingList.size());
             isReset = true;
         }
+    }
+    
+    @Override
+    public Iterator<T> iterator() {
+        return this;
     }
     
     @Nonnull
