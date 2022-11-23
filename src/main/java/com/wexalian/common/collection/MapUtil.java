@@ -16,6 +16,7 @@ public final class MapUtil {
     public static Builder newHashMap() {
         return newMap(HashMap::new);
     }
+    
     @Nonnull
     public static <T extends Enum<T>> Builder newEnumMap(Class<T> baseEnum) {
         return newMap(() -> new EnumMap<>(baseEnum));
@@ -62,6 +63,13 @@ public final class MapUtil {
         public final <K, V> Map<K, V> fill(@Nonnull Consumer<Map<K, V>> filler) {
             Map<K, V> map = (Map<K, V>) mapSupplier.get();
             filler.accept(map);
+            return map;
+        }
+        
+        @Nonnull
+        public final <K, V> Map<K, V> reversed(@Nonnull Map<V, K> otherMap) {
+            Map<K, V> map = (Map<K, V>) mapSupplier.get();
+            otherMap.forEach((value, key) -> map.put(key, value));
             return map;
         }
     }
