@@ -12,6 +12,7 @@ plugins {
     id 'signing'
     id 'org.javamodularity.moduleplugin' version '1.8.12'
     id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'systems.manifold.manifold-gradle-plugin' version '0.0.2-alpha'
 }
 
 group = 'com.wexalian.common'
@@ -26,6 +27,9 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.9.0' //TODO api instead of implementation?
 
+    implementation "systems.manifold:manifold-ext-rt:2022.1.27"
+    annotationProcessor "systems.manifold:manifold-ext-rt:2022.1.27"
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.0'
@@ -33,6 +37,10 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+manifold {
+    manifoldVersion = '2022.1.27'
 }
 
 java {
