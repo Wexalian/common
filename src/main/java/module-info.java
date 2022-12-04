@@ -4,9 +4,9 @@ module com.wexalian.common {
     
     requires java.logging;
     
-    requires manifold;
-    requires manifold.rt;
-    requires manifold.ext.rt;
+    requires transitive manifold;
+    requires transitive manifold.rt;
+    requires transitive manifold.ext.rt;
     
     exports com.wexalian.common.collection.iterator;
     exports com.wexalian.common.collection.pair;
