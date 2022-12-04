@@ -8,12 +8,12 @@ import manifold.ext.rt.api.This;
 @Extension
 public class StringExtensions {
     @Nonnull
-    public static String format(@This String self, @Nonnull Object[] params) {
+    public static String formatting(@This String self, @Nonnull Object[] params) {
         return StringUtil.format(self, params);
     }
     
     @Nonnull
-    public static String format(@This String self, @Nonnull Object first, @Nonnull Object... params) {
+    public static String formatting(@This String self, @Nonnull Object first, @Nonnull Object... params) {
         return StringUtil.format(self, first, params);
     }
     
