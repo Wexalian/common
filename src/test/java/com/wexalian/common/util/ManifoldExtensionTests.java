@@ -14,8 +14,8 @@ public class ManifoldExtensionTests {
     
     @Test
     void format() {
-        assertEquals("Value: 4", "Value: {}".format(4));
-        assertEquals("Value: 1.00", "Value: {%.2f}".format(1F));
+        assertEquals("Value: 4", "Value: {}".formatting(4));
+        assertEquals("Value: 1.00", "Value: {%.2f}".formatting(1F));
     }
     
     @Test
