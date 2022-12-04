@@ -20,6 +20,7 @@ module com.wexalian.common {
     
     exports com.wexalian.common.extensions.java.lang.String;
     exports com.wexalian.common.extensions.java.util.Collection;
+    exports com.wexalian.common.extensions.java.util.Map;
     
     opens com.wexalian.common.gson to com.google.gson;
 }
