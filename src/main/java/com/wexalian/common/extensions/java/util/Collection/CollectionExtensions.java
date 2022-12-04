@@ -11,12 +11,12 @@ import java.util.function.Function;
 @Extension
 public class CollectionExtensions {
     @Nonnull
-    public static <T> String join(@This Collection<T> self, @Nonnull String delimiter) {
+    public static <E> String join(@This Collection<E> self, @Nonnull String delimiter) {
         return StringUtil.join(self, delimiter);
     }
     
     @Nonnull
-    public static <T> String join(@This Collection<T> self, @Nonnull String delimiter, @Nonnull Function<T, String> formatter) {
+    public static <E> String join(@This Collection<E> self, @Nonnull String delimiter, @Nonnull Function<E, String> formatter) {
         return StringUtil.join(self, delimiter, formatter);
     }
 }
