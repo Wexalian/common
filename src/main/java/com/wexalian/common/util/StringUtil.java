@@ -26,7 +26,7 @@ public class StringUtil {
     public static String format(@Nonnull String text, @Nonnull Object[] params) {
         String formatted = text;
         for (Object param : params) {
-            formatted = formatNextParam(text, param);
+            formatted = formatNextParam(formatted, param);
         }
         return formatted;
     }
