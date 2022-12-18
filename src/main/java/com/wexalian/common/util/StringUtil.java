@@ -6,6 +6,7 @@ import com.wexalian.nullability.annotations.Nullable;
 import java.text.Normalizer;
 import java.util.Collection;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringUtil {
@@ -40,10 +41,10 @@ public class StringUtil {
         int start = text.indexOf("{");
         int end = text.indexOf("}", start);
         if (end - start == 1) {
-            return text.replaceFirst("\\{}", param.toString());
+            return text.replaceFirst(Pattern.quote("{}"), param.toString());
         }
         String format = text.substring(start + 1, end);
-        return text.replaceFirst("\\{" + format + "}", String.format(format, param));
+        return text.replaceFirst(Pattern.quote("{" + format + "}"), String.format(format, param));
     }
     
     @Nonnull
