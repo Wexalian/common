@@ -4,6 +4,7 @@ import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 
 @FunctionalInterface
 public interface ListWrapper<T> extends List<T> {
@@ -136,9 +137,9 @@ public interface ListWrapper<T> extends List<T> {
         return get().subList(fromIndex, toIndex);
     }
     
-    // default <R> List<R> map(Function<T, R> mapping) {
-    //     return get().stream().map(mapping).toList();
-    // }
+    default <R> List<R> as(Function<T, R> mapping) {
+        return stream().map(mapping).toList();
+    }
 
     static <T> ListWrapper<T> wrap(List<T> backingList) {
         return () -> backingList;
