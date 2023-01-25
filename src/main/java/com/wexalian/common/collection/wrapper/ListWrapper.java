@@ -135,4 +135,12 @@ public interface ListWrapper<T> extends List<T> {
     default List<T> subList(int fromIndex, int toIndex) {
         return get().subList(fromIndex, toIndex);
     }
+    
+    // default <R> List<R> map(Function<T, R> mapping) {
+    //     return get().stream().map(mapping).toList();
+    // }
+
+    static <T> ListWrapper<T> wrap(List<T> backingList) {
+        return () -> backingList;
+    }
 }
