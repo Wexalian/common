@@ -9,6 +9,7 @@ module com.wexalian.common {
     exports com.wexalian.common.collection.util;
     exports com.wexalian.common.collection.wrapper;
     exports com.wexalian.common.gson;
+    exports com.wexalian.common.plugin;
     exports com.wexalian.common.property;
     exports com.wexalian.common.stream;
     exports com.wexalian.common.unchecked;
