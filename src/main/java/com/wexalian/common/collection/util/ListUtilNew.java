@@ -44,23 +44,28 @@ public class ListUtilNew {
             return this;
         }
         
+        @Nonnull
         public final <T> Builder values(@Nonnull T[] values) {
             return values(values, ALWAYS);
         }
         
-        public final <T> Builder values(@Nonnull T[] values, Predicate<T> filter) {
+        @Nonnull
+        public final <T> Builder values(@Nonnull T[] values, @Nonnull Predicate<T> filter) {
             return values(List.of(values), filter);
         }
         
+        @Nonnull
         public final <T> Builder values(@Nonnull Iterable<T> iterable) {
             return values(iterable, (Predicate<T>) ALWAYS);
         }
         
-        public final <T> Builder values(@Nonnull Iterable<T> iterable, Predicate<T> filter) {
+        @Nonnull
+        public final <T> Builder values(@Nonnull Iterable<T> iterable, @Nonnull Predicate<T> filter) {
             adders.add(list -> StreamSupport.stream(iterable.spliterator(), true).filter(filter).forEach(list::add));
             return this;
         }
         
+        @Nonnull
         public final <T> Builder fill(@Nonnull Consumer<List<T>> filler) {
             adders.add(list -> filler.accept((List<T>) list));
             return this;
