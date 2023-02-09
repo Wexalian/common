@@ -11,16 +11,14 @@ import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
 public class ListUtilNew {
+    private static final Predicate<Object> ALWAYS = o -> true;
     private static final Predicate<Object> NON_NULL = Objects::nonNull;
     
     @Nonnull
     public static <T> List<T> copy(T... values) {
-        Builder builder = newArrayList();
-        for (T value : values) {
-            if (value != null) {
-                builder.values();
-            }
-        }
+        Builder builder = newArrayList().values(values, NON_NULL);
+        builder;
+        return builder.create();
     }
     
     @Nonnull
@@ -43,28 +41,31 @@ public class ListUtilNew {
         }
         
         @Nonnull
-        public final <T> void value(@Nonnull T value) {
+        public final <T> Builder value(@Nonnull T value) {
             adders.add(list -> list.add(value));
+            return this;
         }
         
-        public final <T> void values(@Nonnull T[] values) {
-            values(values, NON_NULL);
+        public final <T> Builder values(@Nonnull T[] values) {
+            return values(values, ALWAYS);
         }
         
-        public final <T> void values(@Nonnull T[] values, Predicate<T> filter) {
-            values(List.of(values), filter);
+        public final <T> Builder values(@Nonnull T[] values, Predicate<T> filter) {
+            return values(List.of(values), filter);
         }
         
-        public final <T> void values(@Nonnull Iterable<T> iterable) {
-            values(iterable, (Predicate<T>) NON_NULL);
+        public final <T> Builder values(@Nonnull Iterable<T> iterable) {
+            return values(iterable, (Predicate<T>) ALWAYS);
         }
         
-        public final <T> void values(@Nonnull Iterable<T> iterable, Predicate<T> filter) {
+        public final <T> Builder values(@Nonnull Iterable<T> iterable, Predicate<T> filter) {
             adders.add(list -> StreamSupport.stream(iterable.spliterator(), true).filter(filter).forEach(list::add));
+            return this;
         }
         
-        public final <T> void fill(@Nonnull Consumer<List<T>> filler) {
+        public final <T> Builder fill(@Nonnull Consumer<List<T>> filler) {
             adders.add(list -> filler.accept((List<T>) list));
+            return this;
         }
         
         @Nonnull
