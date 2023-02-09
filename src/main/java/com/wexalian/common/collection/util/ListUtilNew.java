@@ -4,10 +4,25 @@ import com.wexalian.nullability.annotations.Nonnull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 
 public class ListUtilNew {
+    private static final Predicate<Object> NON_NULL = Objects::nonNull;
+    
+    @Nonnull
+    public static <T> List<T> copy(T... values) {
+        Builder builder = newArrayList();
+        for (T value : values) {
+            if (value != null) {
+                builder.values();
+            }
+        }
+    }
+    
     @Nonnull
     public static Builder newArrayList() {
         return newList(ArrayList::new);
@@ -32,13 +47,20 @@ public class ListUtilNew {
             adders.add(list -> list.add(value));
         }
         
-        @SafeVarargs
-        public final <T> void values(@Nonnull T... values) {
-            values(List.of(values));
+        public final <T> void values(@Nonnull T[] values) {
+            values(values, NON_NULL);
         }
         
-        public final <T> void values(@Nonnull Iterable<T> values) {
-            adders.add(list -> values.forEach(list::add));
+        public final <T> void values(@Nonnull T[] values, Predicate<T> filter) {
+            values(List.of(values), filter);
+        }
+        
+        public final <T> void values(@Nonnull Iterable<T> iterable) {
+            values(iterable, (Predicate<T>) NON_NULL);
+        }
+        
+        public final <T> void values(@Nonnull Iterable<T> iterable, Predicate<T> filter) {
+            adders.add(list -> StreamSupport.stream(iterable.spliterator(), true).filter(filter).forEach(list::add));
         }
         
         public final <T> void fill(@Nonnull Consumer<List<T>> filler) {
