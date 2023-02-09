@@ -1,11 +1,11 @@
 package com.wexalian.common.util;
 
+import com.wexalian.common.collection.util.ListUtilNew;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
 
 import java.text.Normalizer;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -60,7 +60,7 @@ public class StringUtil {
     
     @Nonnull
     public static <T> String join(@Nullable T[] items, @Nonnull String delimiter, @Nonnull Function<T, String> formatter) {
-        return join(List.of(items), delimiter, formatter);
+        return join(ListUtilNew.copyNonnull(items), delimiter, formatter);
     }
     
     @Nonnull
