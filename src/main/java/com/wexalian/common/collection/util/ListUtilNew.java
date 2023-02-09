@@ -16,9 +16,7 @@ public class ListUtilNew {
     
     @Nonnull
     public static <T> List<T> copy(T... values) {
-        Builder builder = newArrayList().values(values, NON_NULL);
-        builder;
-        return builder.create();
+        return newArrayList().values(values, NON_NULL).create();
     }
     
     @Nonnull
