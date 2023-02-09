@@ -15,7 +15,7 @@ public class ListUtilNew {
     private static final Predicate<Object> NON_NULL = Objects::nonNull;
     
     @Nonnull
-    public static <T> List<T> copy(T... values) {
+    public static <T> List<T> copyNonnull(T... values) {
         return newArrayList().values(values, NON_NULL).create();
     }
     
