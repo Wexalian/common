@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class ListUtilNew {
@@ -51,7 +52,8 @@ public class ListUtilNew {
         
         @Nonnull
         public final <T> Builder values(@Nonnull T[] values, @Nonnull Predicate<T> filter) {
-            return values(List.of(values), filter);
+            adders.add(list -> Stream.of(values).filter(filter).forEach(list::add));
+            return this;
         }
         
         @Nonnull
