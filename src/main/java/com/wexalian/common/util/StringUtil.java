@@ -60,7 +60,7 @@ public class StringUtil {
     
     @Nonnull
     public static <T> String join(@Nullable T[] items, @Nonnull String delimiter, @Nonnull Function<T, String> formatter) {
-        return join(ListUtilNew.copyNonnull(items), delimiter, formatter);
+        return join(ListUtilNew.nonnull(items), delimiter, formatter);
     }
     
     @Nonnull

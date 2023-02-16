@@ -6,31 +6,57 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@SuppressWarnings("unchecked")
 public class ListUtilNew {
     private static final Predicate<Object> ALWAYS = o -> true;
     private static final Predicate<Object> NON_NULL = Objects::nonNull;
     
     @Nonnull
-    public static <T> List<T> copyNonnull(T... values) {
-        return newArrayList().values(values, NON_NULL).create();
+    public static <T> List<T> nonnull(T[] values) {
+        return builder().filtered(values, NON_NULL).create();
     }
     
     @Nonnull
-    public static Builder newArrayList() {
-        return newList(ArrayList::new);
+    public static <T> List<T> nonnull(Iterable<T> values) {
+        return builder().filtered(values, (Predicate<T>) NON_NULL).create();
     }
     
     @Nonnull
-    public static Builder newList(@Nonnull Supplier<List<?>> listSupplier) {
+    public static <T> List<T> filter(T[] values, Predicate<T> filter) {
+        return builder().filtered(values, filter).create();
+    }
+    
+    @Nonnull
+    public static <T> List<T> filter(Iterable<T> values, Predicate<T> filter) {
+        return builder().filtered(values, filter).create();
+    }
+    
+    @Nonnull
+    public static <T, R> List<R> map(T[] values, Function<T, R> mapping) {
+        return builder().mapped(values, mapping).create();
+    }
+    
+    @Nonnull
+    public static <T, R> List<R> map(Iterable<T> values, Function<T, R> mapping) {
+        return builder().mapped(values, mapping).create();
+    }
+    
+    @Nonnull
+    public static Builder builder() {
+        return builder(ArrayList::new);
+    }
+    
+    @Nonnull
+    public static Builder builder(@Nonnull Supplier<List<?>> listSupplier) {
         return new Builder(listSupplier);
     }
     
-    @SuppressWarnings("unchecked")
     public static class Builder {
         private final Supplier<List<?>> listSupplier;
         private final List<ListAdder<?>> adders = new ArrayList<>();
@@ -40,31 +66,46 @@ public class ListUtilNew {
         }
         
         @Nonnull
-        public final <T> Builder value(@Nonnull T value) {
+        public final <T> Builder add(@Nonnull T value) {
             adders.add(list -> list.add(value));
             return this;
         }
         
         @Nonnull
-        public final <T> Builder values(@Nonnull T[] values) {
-            return values(values, ALWAYS);
+        public final <T> Builder all(@Nonnull T[] values) {
+            return all(List.of(values));
         }
         
         @Nonnull
-        public final <T> Builder values(@Nonnull T[] values, @Nonnull Predicate<T> filter) {
-            adders.add(list -> Stream.of(values).filter(filter).forEach(list::add));
+        public final <T> Builder all(@Nonnull Iterable<T> values) {
+            adders.add(list -> values.forEach(list::add));
             return this;
         }
         
         @Nonnull
-        public final <T> Builder values(@Nonnull Iterable<T> iterable) {
-            return values(iterable, (Predicate<T>) ALWAYS);
+        public final <T> Builder all(@Nonnull Stream<T> stream) {
+            adders.add(list -> stream.forEach(list::add));
+            return this;
         }
         
         @Nonnull
-        public final <T> Builder values(@Nonnull Iterable<T> iterable, @Nonnull Predicate<T> filter) {
-            adders.add(list -> StreamSupport.stream(iterable.spliterator(), true).filter(filter).forEach(list::add));
-            return this;
+        public final <T> Builder filtered(@Nonnull T[] values, @Nonnull Predicate<T> filter) {
+            return all(stream(values).filter(filter));
+        }
+        
+        @Nonnull
+        public final <T> Builder filtered(@Nonnull Iterable<T> values, @Nonnull Predicate<T> filter) {
+            return all(stream(values).filter(filter));
+        }
+        
+        @Nonnull
+        public final <T, R> Builder mapped(@Nonnull T[] values, @Nonnull Function<T, R> mapping) {
+            return all(stream(values).map(mapping));
+        }
+        
+        @Nonnull
+        public final <T, R> Builder mapped(@Nonnull Iterable<T> values, @Nonnull Function<T, R> mapping) {
+            return all(stream(values).map(mapping));
         }
         
         @Nonnull
@@ -76,13 +117,21 @@ public class ListUtilNew {
         @Nonnull
         public final <T> List<T> create() {
             List<T> list = (List<T>) listSupplier.get();
-            adders.forEach(adder -> ((ListAdder<T>) adder).addToList(list));
+            adders.forEach(adder -> ((ListAdder<T>) adder).add(list));
             return list;
+        }
+        
+        private <T> Stream<T> stream(T[] values) {
+            return Stream.of(values);
+        }
+        
+        private <T> Stream<T> stream(Iterable<T> iterable) {
+            return StreamSupport.stream(iterable.spliterator(), true);
         }
         
         @FunctionalInterface
         public interface ListAdder<T> {
-            void addToList(@Nonnull List<T> list);
+            void add(@Nonnull List<T> list);
         }
     }
 }
