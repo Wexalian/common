@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'com.wexalian.common'
-version = '0.0.26-SNAPSHOT'
+version = '0.0.26'
 
 repositories {
     mavenCentral()
