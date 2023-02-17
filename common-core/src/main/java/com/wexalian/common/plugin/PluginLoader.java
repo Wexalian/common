@@ -1,5 +1,7 @@
 package com.wexalian.common.plugin;
 
+import com.wexalian.nullability.annotations.Nonnull;
+
 import java.io.IOException;
 import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
@@ -21,11 +23,12 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
     
     private PluginLoader(Iterator<T> iterator) {this.iterator = iterator;}
     
+    @Override
     public Iterator<T> iterator() {
         return iterator;
     }
     
-    public static void init(ServiceLoaderFunction serviceLoaderFunc) {
+    public static void init(@Nonnull ServiceLoaderFunction serviceLoaderFunc) {
         if (!init) {
             serviceLoader = serviceLoaderFunc;
             
@@ -38,7 +41,7 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
         else throw new IllegalStateException("PluginLoader can only be initialized once!");
     }
     
-    public static void loadPlugins(Path path) {
+    public static void loadPlugins(@Nonnull Path path) {
         if (init) {
             try (Stream<Path> paths = Files.list(path)) {
                 ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(Path[]::new));
@@ -54,7 +57,8 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
         else throw new IllegalStateException("PluginLoader has to be initialized before you can load plugins!");
     }
     
-    public static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, boolean useDefault) {
+    @Nonnull
+    public static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> clazz, boolean useDefault) {
         if (init) {
             Stream<T> pluginStream = pluginLayerMap.values()
                                                    .stream()
@@ -71,12 +75,14 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
         else throw new IllegalStateException("PluginLoader has to be initialized before you can load services from plugins!");
     }
     
-    public static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> pluginClass) {
+    @Nonnull
+    public static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass) {
         return PluginLoader.load(pluginClass, true);
     }
     
     @FunctionalInterface
     public interface ServiceLoaderFunction {
-        <T> ServiceLoader<T> load(ModuleLayer layer, Class<T> clazz);
+        @Nonnull
+        <T> ServiceLoader<T> load(@Nonnull ModuleLayer layer, @Nonnull Class<T> clazz);
     }
 }
