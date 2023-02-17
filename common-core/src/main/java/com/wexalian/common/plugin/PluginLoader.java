@@ -36,7 +36,10 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
             coreLayer = coreClass.getModule().getLayer();
             coreLoader = coreClass.getClassLoader();
             
-            init = true;
+            if(coreLayer == null) {
+                throw new IllegalStateException("PluginLoader can only be initialized from a named module!");
+            }
+            else init = true;
         }
         else throw new IllegalStateException("PluginLoader can only be initialized once!");
     }
