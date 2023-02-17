@@ -11,7 +11,6 @@ import java.util.stream.*;
 
 @FunctionalInterface
 public interface StreamWrapper<T> extends Stream<T> {
-    
     @Nonnull
     Stream<T> get();
     
@@ -253,5 +252,26 @@ public interface StreamWrapper<T> extends Stream<T> {
     @Nonnull
     default void close() {
         get().close();
+    }
+    
+    @FunctionalInterface
+    interface Iterable<T> extends StreamWrapper<T>, java.lang.Iterable<T> {
+        @Nonnull
+        @Override
+        default void forEach(@Nonnull Consumer<? super T> action) {
+            get().forEach(action);
+        }
+    
+        @Nonnull
+        @Override
+        default Iterator<T> iterator() {
+            return get().iterator();
+        }
+        
+        @Nonnull
+        @Override
+        default Spliterator<T> spliterator() {
+            return get().spliterator();
+        }
     }
 }
