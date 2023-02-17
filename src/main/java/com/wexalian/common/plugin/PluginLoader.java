@@ -35,5 +35,10 @@ public interface PluginLoader<T extends IAbstractPlugin> extends StreamWrapper.I
     interface ServiceLoaderFunction {
         @Nonnull
         <T> ServiceLoader<T> load(@Nonnull ModuleLayer layer, @Nonnull Class<T> clazz);
+        
+        @Nonnull
+        default <T> Stream<T> stream(@Nonnull ModuleLayer layer, @Nonnull Class<T> clazz) {
+            return load(layer, clazz).stream().map(ServiceLoader.Provider::get);
+        }
     }
 }
