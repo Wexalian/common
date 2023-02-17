@@ -1,6 +1,8 @@
-package com.wexalian.common.util;
+package com.wexalian.common.test.util;
 
+import com.wexalian.common.util.StringUtil;
 import com.wexalian.nullability.annotations.Nonnull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -16,7 +18,7 @@ public class StringUtilTests {
     @Test
     @SuppressWarnings("ConstantConditions")
     void isNull() {
-        assertTrue(StringUtil.isNull(null));
+        Assertions.assertTrue(StringUtil.isNull(null));
         assertFalse(StringUtil.isNull(""));
         assertFalse(StringUtil.isNull("Test"));
     }

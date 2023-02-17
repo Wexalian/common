@@ -2,6 +2,7 @@ out
 .gradle
 .idea
 /build
+*/build
 
 gradle.properties
 
