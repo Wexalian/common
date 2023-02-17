@@ -46,15 +46,17 @@ public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T
     
     public static void loadPlugins(@Nonnull Path path) {
         if (init) {
-            try (Stream<Path> paths = Files.list(path)) {
-                ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(Path[]::new));
-                List<String> moduleNames = moduleFinder.findAll().stream().map(ref -> ref.descriptor().name()).toList();
-                Configuration configuration = coreLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
-                ModuleLayer pluginLayer = coreLayer.defineModulesWithOneLoader(configuration, coreLoader);
-                pluginLayerMap.put(path, pluginLayer);
-            }
-            catch (IOException e) {
-                throw new IllegalStateException("Error loading plugins from path " + path, e);
+            if (Files.exists(path)) {
+                try (Stream<Path> paths = Files.list(path)) {
+                    ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(Path[]::new));
+                    List<String> moduleNames = moduleFinder.findAll().stream().map(ref -> ref.descriptor().name()).toList();
+                    Configuration configuration = coreLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
+                    ModuleLayer pluginLayer = coreLayer.defineModulesWithOneLoader(configuration, coreLoader);
+                    pluginLayerMap.put(path, pluginLayer);
+                }
+                catch (IOException e) {
+                    throw new IllegalStateException("Error loading plugins from path " + path, e);
+                }
             }
         }
         else throw new IllegalStateException("PluginLoader has to be initialized before you can load plugins!");
