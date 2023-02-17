@@ -2,91 +2,35 @@ package com.wexalian.common.plugin;
 
 import com.wexalian.nullability.annotations.Nonnull;
 
-import java.io.IOException;
-import java.lang.module.Configuration;
-import java.lang.module.ModuleFinder;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
-public final class PluginLoader<T extends IAbstractPlugin> implements Iterable<T> {
-    private static final Map<Path, ModuleLayer> pluginLayerMap = new HashMap<>();
-    
-    private static ServiceLoaderFunction serviceLoader;
-    private static ModuleLayer coreLayer;
-    private static ClassLoader coreLoader;
-    
-    private static boolean init = false;
-    
-    private final Iterator<T> iterator;
-    
-    private PluginLoader(Iterator<T> iterator) {this.iterator = iterator;}
-    
+@FunctionalInterface
+public interface PluginLoader<T extends IAbstractPlugin> extends Iterable<T> {
     @Override
-    public Iterator<T> iterator() {
-        return iterator;
+    Iterator<T> iterator();
+    
+    static void init(@Nonnull ServiceLoaderFunction serviceLoaderFunc) {
+        PluginLoaderImpl.init(serviceLoaderFunc);
     }
     
-    public static void init(@Nonnull ServiceLoaderFunction serviceLoaderFunc) {
-        if (!init) {
-            serviceLoader = serviceLoaderFunc;
-            
-            Class<?> coreClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
-            coreLayer = coreClass.getModule().getLayer();
-            coreLoader = coreClass.getClassLoader();
-            
-            if(coreLayer == null) {
-                throw new IllegalStateException("PluginLoader can only be initialized from a named module!");
-            }
-            else init = true;
-        }
-        else throw new IllegalStateException("PluginLoader can only be initialized once!");
-    }
-    
-    public static void loadPlugins(@Nonnull Path path) {
-        if (init) {
-            if (Files.exists(path)) {
-                try (Stream<Path> paths = Files.list(path)) {
-                    ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(Path[]::new));
-                    List<String> moduleNames = moduleFinder.findAll().stream().map(ref -> ref.descriptor().name()).toList();
-                    Configuration configuration = coreLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
-                    ModuleLayer pluginLayer = coreLayer.defineModulesWithOneLoader(configuration, coreLoader);
-                    pluginLayerMap.put(path, pluginLayer);
-                }
-                catch (IOException e) {
-                    throw new IllegalStateException("Error loading plugins from path " + path, e);
-                }
-            }
-        }
-        else throw new IllegalStateException("PluginLoader has to be initialized before you can load plugins!");
+    static void loadPlugins(@Nonnull Path path) {
+        PluginLoaderImpl.loadPlugins(path);
     }
     
     @Nonnull
-    public static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> clazz, boolean useDefault) {
-        if (init) {
-            Stream<T> pluginStream = pluginLayerMap.values()
-                                                   .stream()
-                                                   .flatMap(layer -> serviceLoader.load(layer, clazz)
-                                                                                  .stream()
-                                                                                  .map(ServiceLoader.Provider::get)
-                                                                                  .filter(IAbstractPlugin::isEnabled));
-            return new PluginLoader<>(pluginStream.iterator());
-        }
-        else if (useDefault) {
-            Stream<T> pluginStream = ServiceLoader.load(clazz).stream().map(ServiceLoader.Provider::get);
-            return new PluginLoader<>(pluginStream.iterator());
-        }
-        else throw new IllegalStateException("PluginLoader has to be initialized before you can load services from plugins!");
+    static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass) {
+        return load(pluginClass, true);
     }
     
     @Nonnull
-    public static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass) {
-        return PluginLoader.load(pluginClass, true);
+    static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass, boolean useDefaultServiceProvider) {
+        return PluginLoaderImpl.load(pluginClass, useDefaultServiceProvider);
     }
     
     @FunctionalInterface
-    public interface ServiceLoaderFunction {
+    interface ServiceLoaderFunction {
         @Nonnull
         <T> ServiceLoader<T> load(@Nonnull ModuleLayer layer, @Nonnull Class<T> clazz);
     }
