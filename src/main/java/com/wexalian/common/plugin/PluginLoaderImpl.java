@@ -9,14 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Stream;
 
 final class PluginLoaderImpl {
     private static final Set<ModuleLayer> pluginLayerMap = new HashSet<>();
     
-    private static PluginLoader.ServiceLoaderFunction serviceLoader;
+    private static PluginLoader.ServiceLoaderLayerFunction serviceLoaderLayer;
     private static ModuleLayer coreLayer;
     private static ClassLoader coreLoader;
     
@@ -24,9 +23,9 @@ final class PluginLoaderImpl {
     
     private PluginLoaderImpl() {}
     
-    static void init(@Nonnull PluginLoader.ServiceLoaderFunction serviceLoaderFunc) {
+    static void init(@Nonnull PluginLoader.ServiceLoaderLayerFunction serviceLoaderFunc) {
         if (!init) {
-            serviceLoader = serviceLoaderFunc;
+            serviceLoaderLayer = serviceLoaderFunc;
             
             Class<?> coreClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
             coreLayer = coreClass.getModule().getLayer();
@@ -58,12 +57,17 @@ final class PluginLoaderImpl {
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load plugins!");
     }
     
-    static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, boolean useDefault) {
+    static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, PluginLoader.ServiceLoaderFallbackFunction serviceLoader) {
         if (init) {
-            return () -> pluginLayerMap.stream().flatMap(layer -> serviceLoader.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
+            if (!pluginLayerMap.isEmpty()) {
+                return () -> pluginLayerMap.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
+            }
+            else {
+                return () -> serviceLoaderLayer.stream(coreLayer, clazz).filter(IAbstractPlugin::isEnabled);
+            }
         }
-        else if (useDefault) {
-            return () -> ServiceLoader.load(clazz).stream().map(ServiceLoader.Provider::get);
+        else if (serviceLoader != null) {
+            return () -> serviceLoader.stream(clazz);
         }
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load services from plugins!");
     }
