@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 final class PluginLoaderImpl {
-    private static final Set<ModuleLayer> pluginLayerMap = new HashSet<>();
+    private static final Set<ModuleLayer> pluginLayerSet = new HashSet<>();
     
     private static PluginLoader.ServiceLoaderLayerFunction serviceLoaderLayer;
     private static ModuleLayer coreLayer;
@@ -47,7 +47,7 @@ final class PluginLoaderImpl {
                     List<String> moduleNames = moduleFinder.findAll().stream().map(ref -> ref.descriptor().name()).toList();
                     Configuration configuration = coreLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
                     ModuleLayer pluginLayer = coreLayer.defineModulesWithOneLoader(configuration, coreLoader);
-                    pluginLayerMap.add(pluginLayer);
+                    pluginLayerSet.add(pluginLayer);
                 }
                 catch (IOException e) {
                     throw new IllegalStateException("Error loading plugins from path " + path, e);
@@ -59,8 +59,8 @@ final class PluginLoaderImpl {
     
     static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, PluginLoader.ServiceLoaderFallbackFunction serviceLoader) {
         if (init) {
-            if (!pluginLayerMap.isEmpty()) {
-                return () -> pluginLayerMap.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
+            if (!pluginLayerSet.isEmpty()) {
+                return () -> pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
             }
             else {
                 return () -> serviceLoaderLayer.stream(coreLayer, clazz).filter(IAbstractPlugin::isEnabled);
