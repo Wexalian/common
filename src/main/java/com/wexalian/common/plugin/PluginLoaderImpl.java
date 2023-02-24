@@ -67,7 +67,7 @@ final class PluginLoaderImpl {
             }
         }
         else if (serviceLoader != null) {
-            return () -> serviceLoader.stream(clazz);
+            return () -> serviceLoader.stream(clazz).filter(IAbstractPlugin::isEnabled);
         }
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load services from plugins!");
     }
