@@ -60,6 +60,23 @@ public final class MapUtil {
         }
         
         @Nonnull
+        public final <K, V> Map<K, V> values(@Nonnull V[] values, @Nonnull Function<V, K> mapping, Function<V, K[]> otherKeys) {
+            return values(List.of(values), mapping, otherKeys);
+        }
+        
+        @Nonnull
+        public final <K, V> Map<K, V> values(@Nonnull Iterable<V> values, @Nonnull Function<V, K> mapping, Function<V, K[]> otherKeys) {
+            Map<K, V> map = (Map<K, V>) mapSupplier.get();
+            values.forEach(value -> {
+                map.put(mapping.apply(value), value);
+                for (K key : otherKeys.apply(value)) {
+                    map.put(key, value);
+                }
+            });
+            return map;
+        }
+        
+        @Nonnull
         public final <K, V> Map<K, V> fill(@Nonnull Consumer<Map<K, V>> filler) {
             Map<K, V> map = (Map<K, V>) mapSupplier.get();
             filler.accept(map);
@@ -72,5 +89,11 @@ public final class MapUtil {
             otherMap.forEach((value, key) -> map.put(key, value));
             return map;
         }
+    }
+    
+    @FunctionalInterface
+    public interface MultiFunction<V, K> {
+        @Nonnull
+        List<K> apply(V v);
     }
 }
