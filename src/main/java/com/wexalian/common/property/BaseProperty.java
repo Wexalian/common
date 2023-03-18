@@ -1,6 +1,6 @@
 package com.wexalian.common.property;
 
-import com.wexalian.common.util.IOptionalLike;
+import com.wexalian.common.util.misc.IOptionalLike;
 import com.wexalian.nullability.annotations.Nullable;
 
 import java.util.ArrayList;

@@ -14,6 +14,7 @@ module com.wexalian.common {
     exports com.wexalian.common.stream;
     exports com.wexalian.common.unchecked;
     exports com.wexalian.common.util;
+    exports com.wexalian.common.util.misc;
     
     opens com.wexalian.common.gson to com.google.gson;
 }
