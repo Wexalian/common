@@ -22,11 +22,6 @@ public interface PluginLoader<T extends IAbstractPlugin> extends StreamWrapper.I
     }
     
     @Nonnull
-    static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass) {
-        return load(pluginClass, null);
-    }
-    
-    @Nonnull
     static <T extends IAbstractPlugin> PluginLoader<T> load(@Nonnull Class<T> pluginClass, ServiceLoaderFallbackFunction fallbackServiceProvider) {
         return PluginLoaderImpl.load(pluginClass, fallbackServiceProvider);
     }

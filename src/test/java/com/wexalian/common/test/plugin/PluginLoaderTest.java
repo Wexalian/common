@@ -21,7 +21,7 @@ public class PluginLoaderTest {
     
     @Test
     void testLoader() {
-        PluginLoader<IAbstractPlugin> loader = PluginLoader.load(IAbstractPlugin.class);
+        PluginLoader<IAbstractPlugin> loader = PluginLoader.load(IAbstractPlugin.class, ServiceLoader::load);
         for (IAbstractPlugin plugin : loader) {
             System.out.println(plugin.getName());
         }
