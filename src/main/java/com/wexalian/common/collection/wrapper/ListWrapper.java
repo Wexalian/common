@@ -140,8 +140,9 @@ public interface ListWrapper<T> extends List<T> {
     default <R> List<R> as(Function<T, R> mapping) {
         return stream().map(mapping).toList();
     }
-
-    static <T> ListWrapper<T> wrap(List<T> backingList) {
-        return () -> backingList;
+    
+    static <T> ListWrapper<T> wrap(List<T> list) {
+        if (list instanceof ListWrapper<T> wrapper) return wrapper;
+        return () -> list;
     }
 }
