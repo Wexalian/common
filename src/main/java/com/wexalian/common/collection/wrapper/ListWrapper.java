@@ -5,6 +5,8 @@ import com.wexalian.nullability.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @FunctionalInterface
 public interface ListWrapper<T> extends List<T> {
@@ -41,7 +43,6 @@ public interface ListWrapper<T> extends List<T> {
     
     @Override
     @Nonnull
-    @SuppressWarnings("SuspiciousToArrayCall")
     default <T1> T1[] toArray(T1[] a) {
         return get().toArray(a);
     }
@@ -137,8 +138,13 @@ public interface ListWrapper<T> extends List<T> {
         return get().subList(fromIndex, toIndex);
     }
     
-    default <R> List<R> as(Function<T, R> mapping) {
-        return stream().map(mapping).toList();
+    @Nonnull
+    default ListWrapper<T> filtered(Predicate<T> predicate) {
+        return wrap(stream().filter(predicate).collect(Collectors.toList()));
+    }
+    @Nonnull
+    default <R> ListWrapper<R> mapped(Function<T, R> mapping) {
+        return wrap(stream().map(mapping).collect(Collectors.toList()));
     }
     
     static <T> ListWrapper<T> wrap(List<T> list) {
