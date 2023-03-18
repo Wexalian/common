@@ -16,12 +16,24 @@ public class StringUtil {
         return string == null;
     }
     
+    public static boolean isNotNull(@Nullable String string) {
+        return !isNull(string);
+    }
+    
     public static boolean isBlank(@Nonnull String string) {
         return string.isBlank();
     }
     
+    public static boolean isNotBlank(@Nonnull String string) {
+        return !isBlank(string);
+    }
+    
     public static boolean isNullOrBlank(@Nullable String string) {
         return isNull(string) || isBlank(string);
+    }
+    
+    public static boolean isNotNullOrBlank(@Nullable String string) {
+        return !isNullOrBlank(string);
     }
     
     @Nonnull
