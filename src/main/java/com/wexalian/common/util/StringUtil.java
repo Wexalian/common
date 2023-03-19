@@ -7,10 +7,12 @@ import com.wexalian.nullability.annotations.Nullable;
 import java.text.Normalizer;
 import java.util.Collection;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringUtil {
+    private static final Pattern FORMATTING_PATTERN = Pattern.compile("\\{([^}]*)}");
     
     public static boolean isNull(@Nullable String string) {
         return string == null;
@@ -40,24 +42,22 @@ public class StringUtil {
     public static String format(@Nonnull String text, @Nonnull Object[] params) {
         String formatted = text;
         for (Object param : params) {
-            formatted = formatNextParam(formatted, param);
+            formatted = formatParam(formatted, param);
         }
         return formatted;
     }
     
     @Nonnull
     public static String format(@Nonnull String text, @Nonnull Object first, @Nonnull Object... params) {
-        return format(formatNextParam(text, first), params);
+        return format(formatParam(text, first), params);
     }
     
-    private static String formatNextParam(String text, Object param) {
-        int start = text.indexOf("{");
-        int end = text.indexOf("}", start);
-        if (end - start == 1) {
-            return text.replaceFirst(Pattern.quote("{}"), param.toString());
+    private static String formatParam(String text, Object param) {
+        Matcher matcher = FORMATTING_PATTERN.matcher(text);
+        if (matcher.find()) {
+            return matcher.replaceFirst(r -> !r.group(1).isBlank() ? String.format(r.group(1), param) : Matcher.quoteReplacement(param.toString()));
         }
-        String format = text.substring(start + 1, end);
-        return text.replaceFirst(Pattern.quote("{" + format + "}"), String.format(format, param));
+        return text;
     }
     
     @Nonnull
