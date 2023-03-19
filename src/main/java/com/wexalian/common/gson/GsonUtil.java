@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import com.wexalian.common.util.misc.Lazy;
 import com.wexalian.common.util.StringUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
@@ -19,19 +18,12 @@ import java.util.logging.Logger;
 public final class GsonUtil {
     private static final Logger LOGGER = Logger.getLogger("com.wexalian.common.gson");
     
-    private static final Lazy<Gson> DEFAULT_GSON = new Lazy<>(() -> new GsonBuilder().setPrettyPrinting().serializeNulls().create());
-    
-    @Nullable
-    private static Gson customGson = null;
-    
-    public static void setCustomGson(@Nonnull Gson gson) {
-        customGson = gson;
-    }
+    private static Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     
     @Nullable
     public static <T> T fromJsonString(@Nonnull String json, @Nonnull TypeToken<T> token) {
         try {
-            return DEFAULT_GSON.getOrDefault(customGson).fromJson(json, token.getType());
+            return GSON.fromJson(json, token.getType());
         }
         catch (Exception e) {
             String message = StringUtil.format("Error parsing json for type '{}', json: '{}'", token.getRawType().getName(), json);
@@ -42,13 +34,13 @@ public final class GsonUtil {
     
     @Nonnull
     public static <T> String toJsonString(@Nonnull T object, @Nonnull TypeToken<T> token) {
-        return DEFAULT_GSON.getOrDefault(customGson).toJson(object, token.getType());
+        return GSON.toJson(object, token.getType());
     }
     
     @Nullable
     public static <T> T fromJsonElement(@Nonnull JsonElement json, @Nonnull Type type) {
         try {
-            return DEFAULT_GSON.getOrDefault(customGson).fromJson(json, type);
+            return GSON.fromJson(json, type);
         }
         catch (Exception e) {
             String message = StringUtil.format("Error parsing json for type '{}'", type.getTypeName());
@@ -59,7 +51,7 @@ public final class GsonUtil {
     
     @Nonnull
     public static <T> JsonElement toJsonElement(@Nonnull T object, @Nonnull Type type) {
-        return DEFAULT_GSON.getOrDefault(customGson).toJsonTree(object, type);
+        return GSON.toJsonTree(object, type);
     }
     
     @Nonnull
@@ -77,7 +69,7 @@ public final class GsonUtil {
             }
             
             String content = Files.readString(path);
-            return DEFAULT_GSON.getOrDefault(customGson).fromJson(content, token.getType());
+            return GSON.fromJson(content, token.getType());
         }
         catch (Exception e) {
             String message = StringUtil.format("Error parsing json file '{}' for type '{}'", path, token.getRawType().getName());
@@ -88,7 +80,7 @@ public final class GsonUtil {
     
     public static <T> void toJsonFile(@Nonnull T object, @Nonnull Path path, @Nonnull TypeToken<T> token) {
         try {
-            String content = DEFAULT_GSON.getOrDefault(customGson).toJson(object, token.getType());
+            String content = GSON.toJson(object, token.getType());
             Files.writeString(path, content);
         }
         catch (Exception e) {
@@ -99,12 +91,16 @@ public final class GsonUtil {
     
     public static void toJsonFile(@Nonnull JsonElement json, @Nonnull Path path) {
         try {
-            String content = DEFAULT_GSON.getOrDefault(customGson).toJson(json);
+            String content = GSON.toJson(json);
             Files.writeString(path, content);
         }
         catch (Exception e) {
             String message = StringUtil.format("Error writing json file '{}'", path);
             LOGGER.log(Level.SEVERE, message, e);
         }
+    }
+    
+    public static void registerTypeAdapter(Type type, Object adapter) {
+        GSON = GSON.newBuilder().registerTypeAdapter(type, adapter).create();
     }
 }
