@@ -12,13 +12,17 @@ import com.wexalian.nullability.annotations.Nullable;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class GsonUtil {
     private static final Logger LOGGER = Logger.getLogger("com.wexalian.common.gson");
     
-    private static Gson GSON = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static Gson GSON = new GsonBuilder().setPrettyPrinting()
+                                                .serializeNulls()
+                                                .registerTypeAdapter(Instant.class, EasyTypeAdapter.create(Instant::toString, Instant::parse))
+                                                .create();
     
     @Nullable
     public static <T> T fromJsonString(@Nonnull String json, @Nonnull TypeToken<T> token) {
