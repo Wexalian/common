@@ -14,13 +14,26 @@ import java.util.stream.Stream;
 
 public final class FilesUtil {
     @Nonnull
-    public static <T> List<T> read(@Nonnull Path path, @Nonnull Function<String, T> mapping) throws IOException {
+    public static <T> List<T> readLines(@Nonnull Path path, @Nonnull Function<String, T> mapping) throws IOException {
         if (Files.exists(path)) {
             try (Stream<String> lines = Files.lines(path)) {
                 return lines.filter(StringUtil::isNotBlank).map(mapping).collect(Collectors.toList());
             }
         }
         return List.of();
+    }
+    
+    @Nonnull
+    public static <T> T readString(@Nonnull Path path, @Nonnull Function<String, T> mapping) throws IOException {
+        return readString(path, mapping, null);
+    }
+    
+    @Nonnull
+    public static <T> T readString(@Nonnull Path path, @Nonnull Function<String, T> mapping, T defaultValue) throws IOException {
+        if (Files.exists(path)) {
+            return mapping.apply(Files.readString(path));
+        }
+        return defaultValue;
     }
     
     @Nonnull
