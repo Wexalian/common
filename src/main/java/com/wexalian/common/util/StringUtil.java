@@ -1,6 +1,6 @@
 package com.wexalian.common.util;
 
-import com.wexalian.common.collection.util.ListUtilNew;
+import com.wexalian.common.collection.util.ListUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
 
@@ -72,7 +72,7 @@ public class StringUtil {
     
     @Nonnull
     public static <T> String join(@Nullable T[] items, @Nonnull String delimiter, @Nonnull Function<T, String> formatter) {
-        return join(ListUtilNew.nonnull(items), delimiter, formatter);
+        return join(ListUtil.nonnull(items), delimiter, formatter);
     }
     
     @Nonnull
