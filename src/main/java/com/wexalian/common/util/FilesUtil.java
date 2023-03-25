@@ -37,7 +37,12 @@ public final class FilesUtil {
     }
     
     @Nonnull
-    public static <T> Path write(@Nonnull Path path, @Nonnull Collection<T> contents, @Nonnull Function<T, String> mapping) throws IOException {
+    public static <T> Path writeLines(@Nonnull Path path, @Nonnull Collection<T> contents, @Nonnull Function<T, String> mapping) throws IOException {
         return Files.write(path, contents.stream().filter(Objects::nonNull).map(mapping).toList());
+    }
+    
+    @Nonnull
+    public static <T> Path writeString(@Nonnull Path path, @Nonnull T content, @Nonnull Function<T, String> mapping) throws IOException {
+        return Files.writeString(path, mapping.apply(content));
     }
 }
