@@ -60,6 +60,7 @@ public class ListUtil {
     public static class Builder {
         private final Supplier<List<?>> listSupplier;
         private final List<ListAdder<?>> adders = new ArrayList<>();
+        private final List<Function<?, ?>> mappers = new ArrayList<>();
         
         private Builder(Supplier<List<?>> listSupplier) {
             this.listSupplier = listSupplier;
@@ -84,7 +85,7 @@ public class ListUtil {
         
         @Nonnull
         public final <T> Builder all(@Nonnull Stream<T> stream) {
-            adders.add(list -> stream.forEach(list::add));
+            adders.add(list -> stream.forEach(l -> list.add(l)));
             return this;
         }
         
@@ -109,6 +110,12 @@ public class ListUtil {
         }
         
         @Nonnull
+        public final <T, R> Builder map(@Nonnull Function<T, R> mapping) {
+            mappers.add(mapping);
+            return this;
+        }
+        
+        @Nonnull
         public final <T> Builder fill(@Nonnull Consumer<List<T>> filler) {
             adders.add(list -> filler.accept((List<T>) list));
             return this;
@@ -118,6 +125,10 @@ public class ListUtil {
         public final <T> List<T> create() {
             List<T> list = (List<T>) listSupplier.get();
             adders.forEach(adder -> ((ListAdder<T>) adder).add(list));
+            
+            for (Function<?, ?> mapper : mappers) {
+                list.replaceAll(v -> ((Function<T, T>) mapper).apply(v));
+            }
             return list;
         }
         
