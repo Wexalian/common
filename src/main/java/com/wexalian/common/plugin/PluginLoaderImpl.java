@@ -60,14 +60,14 @@ final class PluginLoaderImpl {
     static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, PluginLoader.ServiceLoaderFallbackFunction serviceLoader) {
         if (init) {
             if (!pluginLayerSet.isEmpty()) {
-                return () -> pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
+                return () -> pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz))/*.filter(IAbstractPlugin::isEnabled)*/;
             }
             else {
-                return () -> serviceLoaderLayer.stream(coreLayer, clazz).filter(IAbstractPlugin::isEnabled);
+                return () -> serviceLoaderLayer.stream(coreLayer, clazz)/*.filter(IAbstractPlugin::isEnabled)*/;
             }
         }
         else if (serviceLoader != null) {
-            return () -> serviceLoader.stream(clazz).filter(IAbstractPlugin::isEnabled);
+            return () -> serviceLoader.stream(clazz)/*.filter(IAbstractPlugin::isEnabled)*/;
         }
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load services from plugins!");
     }
