@@ -1,5 +1,6 @@
 package com.wexalian.common.plugin;
 
+import com.wexalian.common.collection.iterator.FilteredIterator;
 import com.wexalian.nullability.annotations.Nonnull;
 
 import java.io.IOException;
@@ -7,9 +8,7 @@ import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 final class PluginLoaderImpl {
@@ -60,14 +59,17 @@ final class PluginLoaderImpl {
     static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, PluginLoader.ServiceLoaderFallbackFunction serviceLoader) {
         if (init) {
             if (!pluginLayerSet.isEmpty()) {
-                return () -> pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).filter(IAbstractPlugin::isEnabled);
+                Iterator<T> plugins = pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).iterator();
+                return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
             }
             else {
-                return () -> serviceLoaderLayer.stream(coreLayer, clazz).filter(IAbstractPlugin::isEnabled);
+                Iterator<T> plugins = serviceLoaderLayer.stream(coreLayer, clazz).iterator();
+                return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
             }
         }
         else if (serviceLoader != null) {
-            return () -> serviceLoader.stream(clazz).filter(IAbstractPlugin::isEnabled);
+            Iterator<T> plugins = serviceLoader.stream(clazz).iterator();
+            return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
         }
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load services from plugins!");
     }

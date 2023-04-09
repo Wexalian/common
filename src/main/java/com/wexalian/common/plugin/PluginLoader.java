@@ -1,6 +1,5 @@
 package com.wexalian.common.plugin;
 
-import com.wexalian.common.collection.wrapper.StreamWrapper;
 import com.wexalian.nullability.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -8,10 +7,7 @@ import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 @FunctionalInterface
-public interface PluginLoader<T extends IAbstractPlugin> extends StreamWrapper.Iterable<T> {
-    @Nonnull
-    @Override
-    Stream<T> get();
+public interface PluginLoader<T extends IAbstractPlugin> extends Iterable<T> {
     
     static void init(@Nonnull ServiceLoaderLayerFunction serviceLoaderFunc) {
         PluginLoaderImpl.init(serviceLoaderFunc);
