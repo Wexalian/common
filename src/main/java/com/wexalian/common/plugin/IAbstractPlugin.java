@@ -6,5 +6,7 @@ public interface IAbstractPlugin {
     @Nonnull
     String getName();
     
-    boolean isEnabled();
+    default boolean isEnabled() {
+        return true;
+    }
 }
