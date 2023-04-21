@@ -9,10 +9,12 @@ import com.wexalian.common.util.StringUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 import com.wexalian.nullability.annotations.Nullable;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,5 +108,22 @@ public final class GsonUtil {
     
     public static void registerTypeAdapter(Type type, Object adapter) {
         GSON = GSON.newBuilder().registerTypeAdapter(type, adapter).create();
+    }
+    
+    public static String[] toArray(JsonElement jsonElement) {
+        return toArray(jsonElement, String.class, JsonElement::getAsString);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> T[] toArray(JsonElement json, Class<T> clazz, Function<JsonElement, T> mapping) {
+        if (json.isJsonArray()) {
+            return (T[]) json.getAsJsonArray().asList().stream().map(mapping).toArray();
+        }
+        if (json.isJsonNull()) {
+            return (T[]) Array.newInstance(clazz, 0);
+        }
+        T[] array = (T[]) Array.newInstance(clazz, 1);
+        array[0] = mapping.apply(json);
+        return array;
     }
 }
