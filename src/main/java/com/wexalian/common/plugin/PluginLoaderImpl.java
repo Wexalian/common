@@ -86,9 +86,7 @@ final class PluginLoaderImpl {
     }
     
     private static <T> ServiceLoader<T> loadFromLayer(ModuleLayer layer, Class<T> clazz) {
-        for (Module module : layer.modules()) {
-            module.addUses(clazz);
-        }
+        coreModule.addUses(clazz);
         return ServiceLoader.load(layer, clazz);
     }
     
