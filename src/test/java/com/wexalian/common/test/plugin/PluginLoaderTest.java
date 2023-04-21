@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
-import java.util.ServiceLoader;
 
 public class PluginLoaderTest {
     public static final Path PATH = Path.of(System.getProperty("user.dir"), "..", "common-plugin-test/build/libs");
@@ -15,13 +14,13 @@ public class PluginLoaderTest {
     static void setup() {
         System.out.println("-------------------- !!! MAKE SURE TO BUILD PLUGINS TEST PROJECT AS WELL !!! --------------------");
         
-        PluginLoader.init(ServiceLoader::load);
+        PluginLoader.init();
         PluginLoader.loadPlugins(PATH);
     }
     
     @Test
     void testLoader() {
-        PluginLoader<IAbstractPlugin> loader = PluginLoader.load(IAbstractPlugin.class, ServiceLoader::load);
+        PluginLoader<IAbstractPlugin> loader = PluginLoader.load(IAbstractPlugin.class);
         for (IAbstractPlugin plugin : loader) {
             System.out.println(plugin.getName());
         }

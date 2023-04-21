@@ -1,6 +1,7 @@
 package com.wexalian.common.plugin;
 
-import com.wexalian.common.collection.iterator.FilteredIterator;
+import com.wexalian.common.collection.util.IteratorUtil;
+import com.wexalian.common.collection.util.ListUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 
 import java.io.IOException;
@@ -14,7 +15,9 @@ import java.util.stream.Stream;
 final class PluginLoaderImpl {
     private static final Set<ModuleLayer> pluginLayerSet = new HashSet<>();
     
-    private static PluginLoader.ServiceLoaderLayerFunction serviceLoaderLayer;
+    private static final Module DEFAULT_MODULE = PluginLoaderImpl.class.getModule();
+    
+    private static Module coreModule;
     private static ModuleLayer coreLayer;
     private static ClassLoader coreLoader;
     
@@ -22,12 +25,11 @@ final class PluginLoaderImpl {
     
     private PluginLoaderImpl() {}
     
-    static void init(@Nonnull PluginLoader.ServiceLoaderLayerFunction serviceLoaderFunc) {
+    static void init() {
         if (!init) {
-            serviceLoaderLayer = serviceLoaderFunc;
-            
             Class<?> coreClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
-            coreLayer = coreClass.getModule().getLayer();
+            coreModule = coreClass.getModule();
+            coreLayer = coreModule.getLayer();
             coreLoader = coreClass.getClassLoader();
             
             if (coreLayer == null) {
@@ -56,21 +58,42 @@ final class PluginLoaderImpl {
         else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load plugins!");
     }
     
-    static <T extends IAbstractPlugin> PluginLoader<T> load(Class<T> clazz, PluginLoader.ServiceLoaderFallbackFunction serviceLoader) {
+    static <T> PluginLoader<T> load(Class<T> clazz) {
+        Iterator<T> plugins = loadInternal(clazz);
+        if (IAbstractPlugin.class.isAssignableFrom(clazz)) {
+            return () -> IteratorUtil.filter(plugins, plugin -> ((IAbstractPlugin) plugin).isEnabled());
+        }
+        return () -> plugins;
+    }
+    
+    static <T> List<T> loadAll(Class<T> clazz) {
+        Iterator<T> plugins = loadInternal(clazz);
+        if (IAbstractPlugin.class.isAssignableFrom(clazz)) {
+            return ListUtil.filter(() -> plugins, plugin -> ((IAbstractPlugin) plugin).isEnabled());
+        }
+        return ListUtil.all(() -> plugins);
+    }
+    
+    private static <T> Iterator<T> loadInternal(Class<T> clazz) {
         if (init) {
             if (!pluginLayerSet.isEmpty()) {
-                Iterator<T> plugins = pluginLayerSet.stream().flatMap(layer -> serviceLoaderLayer.stream(layer, clazz)).iterator();
-                return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
+                List<Iterator<T>> list = pluginLayerSet.stream().map(layer -> loadFromLayer(layer, clazz).iterator()).toList();
+                return IteratorUtil.merge(list);
             }
-            else {
-                Iterator<T> plugins = serviceLoaderLayer.stream(coreLayer, clazz).iterator();
-                return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
-            }
+            else return loadFromLayer(coreLayer, clazz).iterator();
         }
-        else if (serviceLoader != null) {
-            Iterator<T> plugins = serviceLoader.stream(clazz).iterator();
-            return () -> FilteredIterator.of(plugins, IAbstractPlugin::isEnabled);
+        else return loadFromBaseModule(clazz).iterator();
+    }
+    
+    private static <T> ServiceLoader<T> loadFromLayer(ModuleLayer layer, Class<T> clazz) {
+        for (Module module : layer.modules()) {
+            module.addUses(clazz);
         }
-        else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load services from plugins!");
+        return ServiceLoader.load(layer, clazz);
+    }
+    
+    private static <T> ServiceLoader<T> loadFromBaseModule(Class<T> clazz) {
+        DEFAULT_MODULE.addUses(clazz);
+        return ServiceLoader.load(DEFAULT_MODULE.getLayer(), clazz);
     }
 }
