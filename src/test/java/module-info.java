@@ -6,7 +6,7 @@ module com.wexalian.common.test {
     
     requires org.junit.jupiter.api;
     
-    opens com.wexalian.common.test.collection.iterator to org.junit.platform.commons;
+    opens com.wexalian.common.test.collection to org.junit.platform.commons;
     opens com.wexalian.common.test.plugin to org.junit.platform.commons;
     opens com.wexalian.common.test.util to org.junit.platform.commons;
     

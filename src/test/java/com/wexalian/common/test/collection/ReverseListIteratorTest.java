@@ -1,4 +1,4 @@
-package com.wexalian.common.test.collection.iterator;
+package com.wexalian.common.test.collection;
 
 import com.wexalian.common.collection.iterator.ReverseListIterator;
 import org.junit.jupiter.api.Test;
