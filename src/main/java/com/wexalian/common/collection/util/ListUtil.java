@@ -18,6 +18,16 @@ public class ListUtil {
     private static final Predicate<Object> NON_NULL = Objects::nonNull;
     
     @Nonnull
+    public static <T> List<T> all(T[] values) {
+        return builder().all(values).create();
+    }
+    
+    @Nonnull
+    public static <T> List<T> all(Iterable<T> values) {
+        return builder().all(values).create();
+    }
+    
+    @Nonnull
     public static <T> List<T> nonnull(T[] values) {
         return builder().filtered(values, NON_NULL).create();
     }
@@ -85,7 +95,7 @@ public class ListUtil {
         
         @Nonnull
         public final <T> Builder all(@Nonnull Stream<T> stream) {
-            adders.add(list -> stream.forEach(l -> list.add(l)));
+            adders.add(list -> stream.forEach(list::add));
             return this;
         }
         
