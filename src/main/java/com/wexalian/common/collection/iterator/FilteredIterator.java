@@ -9,13 +9,13 @@ public class FilteredIterator<T> implements Iterator<T> {
     private final Predicate<T> predicate;
     
     private T next;
-    private boolean hasNext;
+    private boolean hasNext = true;
     
-    private FilteredIterator(Iterator<T> iterator, Predicate<T> predicate) {
+    public FilteredIterator(Iterator<T> iterator, Predicate<T> predicate) {
         this.iterator = iterator;
         this.predicate = predicate;
         
-        nextMatch();
+        next();
     }
     
     @Override
@@ -28,15 +28,9 @@ public class FilteredIterator<T> implements Iterator<T> {
         if (!hasNext) {
             throw new NoSuchElementException();
         }
-        return nextMatch();
-    }
-    
-    private T nextMatch() {
         T old = next;
-        
         while (iterator.hasNext()) {
             T o = iterator.next();
-            
             if (predicate.test(o)) {
                 hasNext = true;
                 next = o;
@@ -45,9 +39,5 @@ public class FilteredIterator<T> implements Iterator<T> {
         }
         hasNext = false;
         return old;
-    }
-    
-    public static <T> FilteredIterator<T> of(Iterator<T> iterator, Predicate<T> predicate) {
-        return new FilteredIterator<>(iterator, predicate);
     }
 }
