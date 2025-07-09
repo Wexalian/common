@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Deprecated
 public final class Unchecked {
     private static final Logger LOGGER = Logger.getLogger("com.wexalian.common.unchecked");
     
@@ -24,8 +25,7 @@ public final class Unchecked {
     public static void run(CheckedRunnable runnable) {
         try {
             runnable.runUnchecked();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
     }
@@ -33,8 +33,7 @@ public final class Unchecked {
     public static <I> void accept(I input, CheckedConsumer<I> consumer) {
         try {
             consumer.acceptUnchecked(input);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
     }
@@ -42,8 +41,7 @@ public final class Unchecked {
     public static <I1, I2> void accept(I1 input1, I2 input2, CheckedBiConsumer<I1, I2> biConsumer) {
         try {
             biConsumer.acceptUnchecked(input1, input2);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
     }
@@ -55,8 +53,7 @@ public final class Unchecked {
     public static <O> O get(CheckedSupplier<O> supplier, O defaultValue) {
         try {
             return supplier.getUnchecked();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
         return defaultValue;
@@ -69,8 +66,7 @@ public final class Unchecked {
     public static <I, O> O apply(I input, CheckedFunction<I, O> function, O defaultValue) {
         try {
             return function.applyUnchecked(input);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
         return defaultValue;
@@ -83,8 +79,7 @@ public final class Unchecked {
     public static <I1, I2, O> O apply(I1 input1, I2 input2, CheckedBiFunction<I1, I2, O> function, O defaultValue) {
         try {
             return function.applyUnchecked(input1, input2);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             defaultExceptionHandler.accept(e);
         }
         return defaultValue;
