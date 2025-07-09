@@ -1,7 +1,6 @@
 package com.wexalian.common.plugin;
 
 import com.wexalian.common.collection.util.IteratorUtil;
-import com.wexalian.common.collection.util.ListUtil;
 import com.wexalian.nullability.annotations.Nonnull;
 
 import java.io.IOException;
@@ -35,9 +34,8 @@ final class PluginLoaderImpl {
             if (coreLayer == null) {
                 throw new IllegalStateException("PluginLoaderImpl can only be initialized from a named module!");
             }
-            else init = true;
-        }
-        else throw new IllegalStateException("PluginLoaderImpl can only be initialized once!");
+            init = true;
+        } else throw new IllegalStateException("PluginLoaderImpl can only be initialized once!");
     }
     
     static void loadPlugins(@Nonnull Path path) {
@@ -45,52 +43,47 @@ final class PluginLoaderImpl {
             if (Files.exists(path)) {
                 try (Stream<Path> paths = Files.list(path)) {
                     ModuleFinder moduleFinder = ModuleFinder.of(paths.toArray(Path[]::new));
-                    List<String> moduleNames = moduleFinder.findAll().stream().map(ref -> ref.descriptor().name()).toList();
-                    Configuration configuration = coreLayer.configuration().resolveAndBind(moduleFinder, ModuleFinder.of(), moduleNames);
+                    List<String> moduleNames = moduleFinder.findAll()
+                                                           .stream()
+                                                           .map(ref -> ref.descriptor().name())
+                                                           .toList();
+                    Configuration configuration = coreLayer.configuration()
+                                                           .resolveAndBind(moduleFinder,
+                                                                           ModuleFinder.of(),
+                                                                           moduleNames);
                     ModuleLayer pluginLayer = coreLayer.defineModulesWithOneLoader(configuration, coreLoader);
                     pluginLayerSet.add(pluginLayer);
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     throw new IllegalStateException("Error loading plugins from path " + path, e);
                 }
             }
-        }
-        else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load plugins!");
+        } else throw new IllegalStateException("PluginLoaderImpl has to be initialized before you can load plugins!");
     }
     
     static <T> PluginLoader<T> load(Class<T> clazz) {
-        Iterator<T> plugins = loadInternal(clazz);
         if (IAbstractPlugin.class.isAssignableFrom(clazz)) {
-            return () -> IteratorUtil.filter(plugins, plugin -> ((IAbstractPlugin) plugin).isEnabled());
+            return () -> IteratorUtil.filter(loadAllServices(clazz), plugin -> ((IAbstractPlugin) plugin).isEnabled());
         }
-        return () -> plugins;
+        return () -> loadAllServices(clazz);
     }
     
-    static <T> List<T> loadAll(Class<T> clazz) {
-        Iterator<T> plugins = loadInternal(clazz);
-        if (IAbstractPlugin.class.isAssignableFrom(clazz)) {
-            return ListUtil.filter(() -> plugins, plugin -> ((IAbstractPlugin) plugin).isEnabled());
-        }
-        return ListUtil.all(() -> plugins);
-    }
-    
-    private static <T> Iterator<T> loadInternal(Class<T> clazz) {
+    private static <T> Iterator<T> loadAllServices(Class<T> clazz) {
         if (init) {
             if (!pluginLayerSet.isEmpty()) {
-                List<Iterator<T>> list = pluginLayerSet.stream().map(layer -> loadFromLayer(layer, clazz).iterator()).toList();
+                List<Iterator<T>> list = pluginLayerSet.stream()
+                                                       .map(layer -> loadService(layer, clazz).iterator())
+                                                       .toList();
                 return IteratorUtil.merge(list);
-            }
-            else return loadFromLayer(coreLayer, clazz).iterator();
-        }
-        else return loadFromBaseModule(clazz).iterator();
+            } else return loadService(coreLayer, clazz).iterator();
+        } else return loadService(clazz).iterator();
     }
     
-    private static <T> ServiceLoader<T> loadFromLayer(ModuleLayer layer, Class<T> clazz) {
-        coreModule.addUses(clazz);
+    private static <T> ServiceLoader<T> loadService(ModuleLayer layer, Class<T> clazz) {
+        coreModule.addUses(clazz); //TODO test and probably fix to DEFAULT_MODULE (not sure tho)
         return ServiceLoader.load(layer, clazz);
     }
     
-    private static <T> ServiceLoader<T> loadFromBaseModule(Class<T> clazz) {
+    private static <T> ServiceLoader<T> loadService(Class<T> clazz) {
         DEFAULT_MODULE.addUses(clazz);
         return ServiceLoader.load(DEFAULT_MODULE.getLayer(), clazz);
     }
