@@ -2,7 +2,6 @@ package com.wexalian.common.test.util;
 
 import com.wexalian.common.util.StringUtil;
 import com.wexalian.nullability.annotations.Nonnull;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -13,27 +12,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class StringUtilTests {
     private static final Collection<TestEnum> ENUM_SET = EnumSet.allOf(TestEnum.class);
+    public static final String TEST_SLUG_1 = "SmöåÉèêk     çèàLà";
+    public static final String TEST_SLUG_1_SLUG = "smoaeeek_ceala";
+    public static final String TEST_SLUG_1_ESCAPED = "Sm\u00F6\u00E5\u00C9\u00E8\u00EAk     \u00E7\u00E8\u00E0L\u00E0";
     
-    
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    void isNull() {
-        Assertions.assertTrue(StringUtil.isNull(null));
-        assertFalse(StringUtil.isNull(""));
-        assertFalse(StringUtil.isNull("Test"));
-    }
+    public static final String TEST_SLUG_2 = "āăąēîïĩíĝġńñšŝśûůŷ";
+    public static final String TEST_SLUG_2_SLUG = "aaaeiiiiggnnsssuuy";
+    public static final String TEST_SLUG_2_ESCAPED = "\u0101\u0103\u0105\u0113\u00EE\u00EF\u0129\u00ED\u011D\u0121\u0144\u00F1\u0161\u015D\u015B\u00FB\u016F\u0177";
     
     @Test
     void isBlank() {
         assertTrue(StringUtil.isBlank(""));
         assertFalse(StringUtil.isBlank("Test"));
-    }
-    
-    @Test
-    void isNullOrBlank() {
-        assertTrue(StringUtil.isNullOrBlank(null));
-        assertTrue(StringUtil.isNullOrBlank(""));
-        assertFalse(StringUtil.isNullOrBlank("Test"));
     }
     
     @Test
@@ -52,7 +42,11 @@ public class StringUtilTests {
     
     @Test
     void slug() {
-        assertEquals("smoaeeek_ceala", StringUtil.slug("Sm\u00F6\u00E5\u00C9\u00E8\u00EAk     \u00E7\u00E8\u00E0L\u00E0"));
+        assertEquals(TEST_SLUG_1_SLUG, StringUtil.slug(TEST_SLUG_1));
+        assertEquals(TEST_SLUG_1_SLUG, StringUtil.slug(TEST_SLUG_1_ESCAPED));
+        
+        assertEquals(TEST_SLUG_2_SLUG, StringUtil.slug(TEST_SLUG_2));
+        assertEquals(TEST_SLUG_2_SLUG, StringUtil.slug(TEST_SLUG_2_ESCAPED));
     }
     
     private enum TestEnum {

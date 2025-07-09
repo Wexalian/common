@@ -10,7 +10,7 @@ public class SystemUtilTests {
     
     @Test
     public void testOs() {
-        Assertions.assertTrue(SystemUtil.IS_WINDOWS, "os not windows");
-        assertFalse(SystemUtil.IS_MAC_OSX, "os not mac osx");
+        assertTrue(SystemUtil.IS_WINDOWS, "os not windows");
+        assertFalse(SystemUtil.IS_MAC, "os not mac osx");
     }
 }
